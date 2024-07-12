@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voting Eligibility - Elementsian Government</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 20px;
+            background-color: #f0f0f0;
+            transition: opacity 0.5s ease-in-out;
+            opacity: 1;
+        }
+        .container {
+            text-align: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 400px;
+            height: 450px;
+        }
+        h1 {
+            font-size: 2em;
+            margin-bottom: 20px;
+            color: #4b8ca0;
+        }
+        label {
+            display: block;
+            margin: 10px 0;
+            font-size: 1.2em;
+        }
+        input[type="text"], input[type="date"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 1em;
+        }
+        .loading {
+            font-size: 1.5em;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .custom-loader {
+            margin-top: 20px;
+            position: relative;
+            width: 64px;
+            height: 64px;
+            z-index: 101;
+        }
+        .custom-loader::before, .custom-loader::after {
+            content: '';
+            position: absolute;
+            border-radius: 50%;
+            background-color: #3498db;
+            animation: pulse 1s infinite ease-in-out;
+        }
+        .custom-loader::before {
+            width: 64px;
+            height: 64px;
+            top: 0;
+            left: 0;
+            background-color: #396c8f;
+            animation-delay: 0.4s;
+        }
+        .custom-loader::after {
+            width: 48px;
+            height: 48px;
+            top: 8px;
+            left: 8px;
+            background-color: #f3f3f3;
+            animation-delay: 0.8s;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(0.8);
+                opacity: 0.5;
+            }
+        }
+        .result {
+            display: none;
+            margin-top: 20px;
+            font-size: 1.5em;
+        }
+        .flag {
+            width: 40px;
+            height: auto;
+            display: block;
+            margin: 0 auto 10px auto; /* Centers the flag horizontally */
+        }
+        footer {
+            position: absolute;
+            bottom: 10px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.9em;
+            color: #777;
+            z-index: 100;
+        }
+        .eligibility-check {
+            margin-top: 10px;
+            font-size: 1.1em;
+            background-color: #4b8ca0;
+            color: white;
+            padding: 15px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            transition: 0.3s ease-in-out;
+        }
+        .eligibility-check:hover {
+            background-color: #487d8d;
+        }
+        .space-gif {
+            width: 80%;
+            height: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .full-page-loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgb(255, 255, 255);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            z-index: 99;
+        }
+        @media only screen and (max-width: 600px) {
+    .container {
+        width: 310px;
+    } }
+    </style>
+</head>
+<body>
+    <div class="full-page-loader" id="full-page-loader">
+        Loading...
+        <div class="custom-loader"></div>
+    </div>
+    <div class="container" id="container" style="display: none;">
+        <h1>Voting Eligibility Check</h1>
+        <form id="eligibility-form">
+            <label>
+                Full Name:
+                <input type="text" id="full_name" required>
+            </label>
+            <label>
+                Citizenship ID:
+                <input type="text" id="citizenship_id" required>
+            </label>
+            <button type="button" class="eligibility-check" onclick="checkVotingEligibility()">Check Eligibility</button>
+        </form>
+        <div class="loading" id="loading" style="display: none;">
+            Checking your eligibility...
+            <div class="custom-loader"></div>
+        </div>
+        <div id="result" class="result"></div>
+        <img id="space-gif" class="space-gif" src="https://i.ibb.co/RHJZR1w/voting.gif" alt="Space Gif" style="display: none;">
+    </div>
+    <footer>
+        <img src="https://i.ibb.co/CBpzkT9/Elementsian-flag.png" alt="Elementsian Flag" class="flag">
+        &copy; 2024 Elementsia Department of Internal Affairs
+    </footer>
+
+    <script>
+        function checkVotingEligibility() {
+            const fullName = document.getElementById('full_name').value;
+            const citizenshipId = document.getElementById('citizenship_id').value;
+            const resultDiv = document.getElementById('result');
+            const loadingDiv = document.getElementById('loading');
+            const spaceGif = document.getElementById('space-gif');
+
+            // Hide the form and show the loading animation
+            document.getElementById('eligibility-form').style.display = 'none';
+            loadingDiv.style.display = 'flex';
+
+            // Mocking an API call with a timeout
+            setTimeout(() => {
+                // Hide the loading animation and show the result
+                loadingDiv.style.display = 'none';
+                resultDiv.style.display = 'block';
+
+                // Mock result based on the input (you should replace this with an actual API call)
+                if (fullName && citizenshipId) {
+                    resultDiv.innerText = `${fullName}, you are eligible to vote.`;
+                    resultDiv.style.color = 'green';
+                    spaceGif.style.display = 'block';
+                } else {
+                    resultDiv.innerText = 'Please fill in all the fields.';
+                    resultDiv.style.color = 'red';
+                }
+            }, 3000); // 3 seconds delay
+        }
+
+        // Simulate loading time for full-page loader
+        window.onload = function() {
+            setTimeout(() => {
+                document.getElementById('full-page-loader').style.display = 'none';
+                document.getElementById('container').style.display = 'block';
+            }, 2000); // 2 seconds delay
+        }
+    </script>
+</body>
+</html>
